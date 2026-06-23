@@ -1,0 +1,50 @@
+{"id": "cap-001", "category": "math", "kind": "numeric", "prompt": "A train travels 60 miles in 1.5 hours. What is its average speed in miles per hour?", "answer": "40"}
+{"id": "cap-002", "category": "math", "kind": "numeric", "prompt": "A shirt costs $25 and is discounted 20%. What is the sale price in dollars?", "answer": "20"}
+{"id": "cap-003", "category": "math", "kind": "numeric", "prompt": "If 3 pencils cost $1.50, how much do 10 pencils cost in dollars?", "answer": "5"}
+{"id": "cap-004", "category": "math", "kind": "numeric", "prompt": "A rectangle is 8 cm by 5 cm. What is its area in square centimeters?", "answer": "40"}
+{"id": "cap-005", "category": "math", "kind": "numeric", "prompt": "What is 15% of 240?", "answer": "36"}
+{"id": "cap-006", "category": "math", "kind": "numeric", "prompt": "A car uses 4 gallons to travel 120 miles. How many miles per gallon does it get?", "answer": "30"}
+{"id": "cap-007", "category": "math", "kind": "numeric", "prompt": "Sarah has 3 times as many apples as Tom. Together they have 48 apples. How many apples does Sarah have?", "answer": "36"}
+{"id": "cap-008", "category": "math", "kind": "numeric", "prompt": "A book has 320 pages. If you read 40 pages a day, how many days does it take to finish?", "answer": "8"}
+{"id": "cap-009", "category": "math", "kind": "numeric", "prompt": "The sum of two consecutive integers is 75. What is the larger one?", "answer": "38"}
+{"id": "cap-010", "category": "math", "kind": "numeric", "prompt": "A tank holds 200 liters and is 35% full. How many liters are in it?", "answer": "70"}
+{"id": "cap-011", "category": "math", "kind": "numeric", "prompt": "If a number is doubled and then increased by 7, the result is 23. What is the number?", "answer": "8"}
+{"id": "cap-012", "category": "math", "kind": "numeric", "prompt": "A recipe needs 2 cups of flour for 12 cookies. How many cups are needed for 30 cookies?", "answer": "5"}
+{"id": "cap-013", "category": "math", "kind": "numeric", "prompt": "A worker earns $18 per hour and works 37.5 hours. What is the weekly pay in dollars?", "answer": "675"}
+{"id": "cap-014", "category": "math", "kind": "numeric", "prompt": "Three friends split a $90 bill equally. How much does each person pay in dollars?", "answer": "30"}
+{"id": "cap-015", "category": "math", "kind": "numeric", "prompt": "A triangle has a base of 10 and a height of 6. What is its area?", "answer": "30"}
+{"id": "cap-016", "category": "math", "kind": "numeric", "prompt": "If you save $25 each week, how many weeks does it take to save $300?", "answer": "12"}
+{"id": "cap-017", "category": "math", "kind": "numeric", "prompt": "A store sells 5 widgets for $20. What is the price of one widget in dollars?", "answer": "4"}
+{"id": "cap-018", "category": "math", "kind": "numeric", "prompt": "The temperature rose from -5 degrees Celsius to 12 degrees Celsius. By how many degrees did it rise?", "answer": "17"}
+{"id": "cap-019", "category": "logic", "kind": "numeric", "prompt": "Consider the sequence 2, 6, 12, 20, 30, ... What is the next number?", "answer": "42"}
+{"id": "cap-020", "category": "logic", "kind": "exact", "prompt": "If all Bloops are Razzies and all Razzies are Lazzies, are all Bloops definitely Lazzies? Answer with only yes or no.", "answer": "yes"}
+{"id": "cap-021", "category": "logic", "kind": "exact", "prompt": "Tom is taller than Jim. Jim is taller than Sam. Who is the shortest? Reply with only the name.", "answer": "Sam"}
+{"id": "cap-022", "category": "logic", "kind": "numeric", "prompt": "A clock shows exactly 3:00. What is the angle in degrees between the hour and minute hands?", "answer": "90"}
+{"id": "cap-023", "category": "logic", "kind": "numeric", "prompt": "How many times does the digit 7 appear when writing all the whole numbers from 1 to 50?", "answer": "5"}
+{"id": "cap-024", "category": "logic", "kind": "exact", "prompt": "If today is Wednesday, what day of the week will it be in 10 days? Reply with only the day name.", "answer": "Saturday"}
+{"id": "cap-025", "category": "logic", "kind": "numeric", "prompt": "A bat and a ball cost $1.10 in total. The bat costs $1.00 more than the ball. How much does the ball cost in dollars?", "answer": "0.05"}
+{"id": "cap-026", "category": "logic", "kind": "numeric", "prompt": "What number is exactly halfway between 14 and 50?", "answer": "32"}
+{"id": "cap-027", "category": "logic", "kind": "numeric", "prompt": "If 5 machines make 5 widgets in 5 minutes, how many minutes does it take 100 machines to make 100 widgets?", "answer": "5"}
+{"id": "cap-028", "category": "logic", "kind": "numeric", "prompt": "A snail climbs 3 feet up a well each day and slips back 2 feet each night. The well is 10 feet deep. On which day does it first reach the top?", "answer": "8"}
+{"id": "cap-029", "category": "logic", "kind": "contains", "prompt": "In a foot race you overtake the person in second place. What place are you in now? Answer with the ordinal word.", "answer": "second"}
+{"id": "cap-030", "category": "logic", "kind": "numeric", "prompt": "Letters are numbered A=1, B=2, C=3, and so on. What is the value of the letter E?", "answer": "5"}
+{"id": "cap-031", "category": "instruction", "kind": "exact", "prompt": "Reply with only the word BANANA in uppercase and nothing else.", "answer": "BANANA"}
+{"id": "cap-032", "category": "instruction", "kind": "exact", "prompt": "Extract the email address from this text and reply with only the email: 'Contact me at jane.doe@example.com for details.'", "answer": "jane.doe@example.com"}
+{"id": "cap-033", "category": "instruction", "kind": "exact", "prompt": "Reverse the word 'stressed'. Reply with only the reversed word.", "answer": "desserts"}
+{"id": "cap-034", "category": "instruction", "kind": "numeric", "prompt": "How many letter r's are in the word 'strawberry'? Reply with only the number.", "answer": "3"}
+{"id": "cap-035", "category": "instruction", "kind": "exact", "prompt": "Reply with only the third word of this sentence: 'The quick brown fox jumps.'", "answer": "brown"}
+{"id": "cap-036", "category": "instruction", "kind": "numeric", "prompt": "Count the words in this sentence and reply with only the number: 'I love clean data pipelines.'", "answer": "5"}
+{"id": "cap-037", "category": "instruction", "kind": "exact", "prompt": "Convert 'hello world' to title case. Reply with only the result.", "answer": "Hello World"}
+{"id": "cap-038", "category": "instruction", "kind": "exact", "prompt": "What is the last letter of the word 'eval'? Reply with only the letter.", "answer": "l"}
+{"id": "cap-039", "category": "instruction", "kind": "exact", "prompt": "Output the numbers 1 to 5 separated by commas with no spaces.", "answer": "1,2,3,4,5"}
+{"id": "cap-040", "category": "instruction", "kind": "numeric", "prompt": "Extract the year from this date and reply with only the year: 'March 14, 2027'.", "answer": "2027"}
+{"id": "cap-041", "category": "factual", "kind": "exact", "prompt": "What is the chemical symbol for gold? Reply with only the symbol.", "answer": "Au"}
+{"id": "cap-042", "category": "factual", "kind": "exact", "prompt": "What is the capital of Japan? Reply with only the city name.", "answer": "Tokyo"}
+{"id": "cap-043", "category": "factual", "kind": "numeric", "prompt": "How many continents are there on Earth? Reply with only the number.", "answer": "7"}
+{"id": "cap-044", "category": "factual", "kind": "exact", "prompt": "Which planet is known as the Red Planet? Reply with only the planet name.", "answer": "Mars"}
+{"id": "cap-045", "category": "factual", "kind": "contains", "prompt": "What is the largest ocean on Earth? Reply with only the ocean name.", "answer": "Pacific"}
+{"id": "cap-046", "category": "factual", "kind": "numeric", "prompt": "In what year did World War II end? Reply with only the year.", "answer": "1945"}
+{"id": "cap-047", "category": "factual", "kind": "contains", "prompt": "What gas do plants primarily absorb from the atmosphere for photosynthesis? Reply with only the gas name.", "answer": "carbon dioxide"}
+{"id": "cap-048", "category": "factual", "kind": "numeric", "prompt": "What is the square root of 144? Reply with only the number.", "answer": "12"}
+{"id": "cap-049", "category": "factual", "kind": "numeric", "prompt": "How many sides does a hexagon have? Reply with only the number.", "answer": "6"}
+{"id": "cap-050", "category": "factual", "kind": "numeric", "prompt": "What is the boiling point of water at sea level in degrees Celsius? Reply with only the number.", "answer": "100"}

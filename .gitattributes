@@ -1,0 +1,14 @@
+# Normalize all text to LF in the repo so the Linux CI runner (and the bash
+# steps in .github/workflows) never see stray CRLF carriage returns.
+* text=auto eol=lf
+
+# Keep these explicitly LF.
+*.sh    text eol=lf
+*.yml   text eol=lf
+*.yaml  text eol=lf
+*.py    text eol=lf
+
+# Binary assets (none yet, but future-proof).
+*.png binary
+*.jpg binary
+*.ico binary

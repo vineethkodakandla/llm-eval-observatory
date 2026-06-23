@@ -1,0 +1,27 @@
+# dependencies
+node_modules/
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# next.js
+.next/
+out/
+next-env.d.ts
+.vercel/
+
+# secrets / env
+.env
+.env*.local
+.env.local
+
+# os / editor
+.DS_Store
+Thumbs.db
+*.log
+
+# NOTE: public/data/ is intentionally NOT ignored — the committed results JSON
+# is the whole point (the dashboard reads it, and the commit history is the
+# audit trail of every nightly run).

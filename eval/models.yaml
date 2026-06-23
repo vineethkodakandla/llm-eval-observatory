@@ -1,0 +1,43 @@
+# Models under test — ALL open-source weights, all on Groq's free tier.
+#
+# Model IDs drift over time. To refresh, hit the live catalog:
+#   curl https://api.groq.com/openai/v1/models -H "Authorization: Bearer $GROQ_API_KEY"
+# and update the `id` fields below. `label` and `family` are display-only.
+#
+# `tier: production` models are stable; `preview` models are eval-only and
+# may be discontinued by Groq with little notice — fine for a dashboard that
+# re-runs nightly, but expect the occasional 404 (the runner logs & skips it).
+
+provider: groq
+endpoint: https://api.groq.com/openai/v1/chat/completions
+
+# Generation defaults (kept small to stay well under the 30k tokens/min free limit).
+defaults:
+  temperature: 0.0        # deterministic grading
+  max_tokens: 768
+  request_timeout_sec: 60
+
+models:
+  - id: llama-3.3-70b-versatile
+    label: Llama 3.3 70B
+    family: Meta Llama
+    tier: production
+    weights: open        # Llama 3.3 Community License
+
+  - id: llama-3.1-8b-instant
+    label: Llama 3.1 8B
+    family: Meta Llama
+    tier: production
+    weights: open
+
+  - id: openai/gpt-oss-20b
+    label: GPT-OSS 20B
+    family: OpenAI OSS
+    tier: production
+    weights: open        # Apache-2.0 open weights
+
+  - id: qwen/qwen3-32b
+    label: Qwen3 32B
+    family: Alibaba Qwen
+    tier: preview
+    weights: open        # Apache-2.0

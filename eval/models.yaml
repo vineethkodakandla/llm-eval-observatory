@@ -36,8 +36,14 @@ models:
     tier: production
     weights: open        # Apache-2.0 open weights
 
-  - id: qwen/qwen3-32b
-    label: Qwen3 32B
+  - id: openai/gpt-oss-120b
+    label: GPT-OSS 120B
+    family: OpenAI OSS
+    tier: production
+    weights: open        # Apache-2.0 open weights
+
+  - id: qwen/qwen3.6-27b
+    label: Qwen3.6 27B
     family: Alibaba Qwen
     tier: preview
-    weights: open        # Apache-2.0
+    weights: open        # Apache-2.0  (was qwen/qwen3-32b — retired by Groq, refreshed 2026-07)

@@ -6,9 +6,10 @@ name: nightly-eval
 
 on:
   schedule:
-    # 07:00 UTC every day (~midnight US Pacific). GitHub may delay scheduled
-    # runs under load; that's fine for a nightly job.
-    - cron: "0 7 * * *"
+    # Every 6 hours (00:00, 06:00, 12:00, 18:00 UTC) so the dashboard stays
+    # continuously fresh on live data. GitHub may delay scheduled runs under
+    # load; that's fine — a missed slot just means the next one refreshes it.
+    - cron: "0 */6 * * *"
   workflow_dispatch: {}   # lets you trigger a run by hand from the Actions tab
 
 # Never let two runs overlap (they'd race on the results commit).

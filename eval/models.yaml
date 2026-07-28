@@ -14,7 +14,7 @@ endpoint: https://api.groq.com/openai/v1/chat/completions
 # Generation defaults (kept small to stay well under the 30k tokens/min free limit).
 defaults:
   temperature: 0.0        # deterministic grading
-  max_tokens: 768
+  max_tokens: 1024        # headroom for reasoning models to finish thinking AND answer
   request_timeout_sec: 60
 
 models:
@@ -47,3 +47,10 @@ models:
     family: Alibaba Qwen
     tier: preview
     weights: open        # Apache-2.0  (was qwen/qwen3-32b — retired by Groq, refreshed 2026-07)
+    params:
+      # Qwen is a reasoning model: by default it inlines its chain-of-thought in
+      # <think>…</think> inside `content`, which pollutes the string-match
+      # graders. "parsed" moves reasoning to a separate field so `content` is
+      # the clean final answer. (The engine also strips stray <think> as a
+      # belt-and-suspenders — see grading.strip_reasoning.)
+      reasoning_format: parsed

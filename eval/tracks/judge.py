@@ -20,8 +20,9 @@ from __future__ import annotations
 
 from itertools import combinations
 
-from config import DATA_IN, Config, ModelSpec
+from config import DATA_IN, JUDGE_MAX_TOKENS, Config, ModelSpec
 from dataio import load_jsonl
+from grading import strip_reasoning
 from providers.groq_client import GroqClient, ModelUnavailable
 from stats import bootstrap_ci, cohen_kappa, fleiss_kappa
 
@@ -34,13 +35,16 @@ SYSTEM = (
 
 
 def _parse_verdict(text: str) -> str | None:
-    for ch in text:
+    # A reasoning model's <think> block is full of '1's and '2's ("Response 1
+    # is…"); parse the verdict from its actual answer, not its scratchpad.
+    for ch in strip_reasoning(text):
         if ch in "12":
             return ch
     return None
 
 
-def _ask(client, cfg, model_id, prompt, r1, r2, good_pos, swapped) -> str | None:
+def _ask(client, cfg, model_id, prompt, r1, r2, good_pos, swapped,
+         extra_params=None) -> str | None:
     user = (
         f"Question:\n{prompt}\n\n"
         f"Response 1:\n{r1}\n\n"
@@ -50,7 +54,8 @@ def _ask(client, cfg, model_id, prompt, r1, r2, good_pos, swapped) -> str | None
     comp = client.chat(
         model_id,
         [{"role": "system", "content": SYSTEM}, {"role": "user", "content": user}],
-        temperature=cfg.temperature, max_tokens=8,
+        temperature=cfg.temperature, max_tokens=JUDGE_MAX_TOKENS,
+        extra_params=extra_params,
         mock_hint={"type": "judge", "good_pos": good_pos, "swapped": swapped},
     )
     return _parse_verdict(comp.text)
@@ -103,12 +108,14 @@ def _run_judge(client, cfg, spec: ModelSpec, items, longer):
 
             # Original order: Response 1 = A, Response 2 = B.
             good_o = "1" if human == "A" else "2"
-            v_o = _ask(client, cfg, spec.id, it["prompt"], a, b, good_o, False)
+            v_o = _ask(client, cfg, spec.id, it["prompt"], a, b, good_o, False,
+                       extra_params=spec.params)
             content_o = _content(v_o, swapped=False)
 
             # Swapped order: Response 1 = B, Response 2 = A.
             good_s = "1" if human == "B" else "2"
-            v_s = _ask(client, cfg, spec.id, it["prompt"], b, a, good_s, True)
+            v_s = _ask(client, cfg, spec.id, it["prompt"], b, a, good_s, True,
+                       extra_params=spec.params)
             content_s = _content(v_s, swapped=True)
 
             # Agreement (averaged over both presentations; unparseable = miss).

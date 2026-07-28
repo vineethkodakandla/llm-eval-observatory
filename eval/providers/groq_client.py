@@ -23,7 +23,10 @@ class GroqError(RuntimeError):
 
 
 class ModelUnavailable(GroqError):
-    """Raised on 404 (e.g. a preview model was retired) so the runner can skip it."""
+    """Raised when a model can't be evaluated so the runner skips it instead of
+    failing the whole sweep — a retired preview model (404) or a request the
+    model rejects outright (400, e.g. an unsupported reasoning parameter after a
+    catalog change). One bad model must never take the nightly run down."""
 
 
 @dataclass
@@ -60,19 +63,23 @@ class GroqClient:
     # -- public API ---------------------------------------------------------
     def chat(self, model: str, messages: list[dict], *,
              temperature: float = 0.0, max_tokens: int = 768,
+             extra_params: dict | None = None,
              mock_hint: dict | None = None) -> Completion:
         """Send a chat completion.
 
+        `extra_params` are per-model payload overrides (e.g. a reasoning-format
+        flag) merged into the request on the live path; they're ignored in mock.
         `mock_hint` is consumed ONLY in mock mode (to synthesize a realistic
         answer distribution) and is completely ignored on the live path, so it
         can never leak gold answers into a real prompt.
         """
         if self.mock:
             return self._mock(model, messages, mock_hint or {})
-        return self._live(model, messages, temperature, max_tokens)
+        return self._live(model, messages, temperature, max_tokens, extra_params)
 
     # -- live path ----------------------------------------------------------
-    def _live(self, model, messages, temperature, max_tokens) -> Completion:
+    def _live(self, model, messages, temperature, max_tokens,
+              extra_params=None) -> Completion:
         self._throttle()
         payload = {
             "model": model,
@@ -80,6 +87,12 @@ class GroqClient:
             "temperature": temperature,
             "max_tokens": max_tokens,
         }
+        # Per-model overrides (reasoning_format, etc.). Applied last, but can't
+        # clobber the core fields above — those are re-pinned right after.
+        if extra_params:
+            payload.update(extra_params)
+            payload["model"] = model
+            payload["messages"] = messages
         headers = {"Authorization": f"Bearer {self.api_key}",
                    "Content-Type": "application/json"}
         backoff = 2.0
@@ -109,6 +122,10 @@ class GroqClient:
                 )
             if r.status_code == 404:
                 raise ModelUnavailable(f"model '{model}' not found (404): {r.text[:200]}")
+            if r.status_code == 400:
+                # A request the model rejects (e.g. an unsupported parameter):
+                # skip this model rather than aborting the entire run.
+                raise ModelUnavailable(f"model '{model}' rejected request (400): {r.text[:200]}")
             if r.status_code == 429:
                 # Respect Retry-After when present, else exponential backoff.
                 wait = float(r.headers.get("retry-after", backoff))

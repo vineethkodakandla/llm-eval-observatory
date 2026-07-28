@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 import yaml
@@ -28,6 +28,12 @@ BOOTSTRAP_ITERS = 5000
 # previous run AND the two runs' 95% CIs do not overlap (see stats.drift).
 DRIFT_ABS_THRESHOLD = 0.05
 
+# The judge is asked for a single character ('1' or '2'), but reasoning models
+# spend generated tokens *thinking* before they answer — an 8-token cap starves
+# them and they return empty content. Give the verdict enough headroom for the
+# reasoning to complete; non-reasoning models still stop after one token.
+JUDGE_MAX_TOKENS = 512
+
 
 @dataclass(frozen=True)
 class ModelSpec:
@@ -36,6 +42,10 @@ class ModelSpec:
     family: str
     tier: str
     weights: str
+    # Optional per-model request overrides merged into the chat payload
+    # (e.g. {"reasoning_format": "parsed"} to keep a reasoning model's <think>
+    # out of `content`). Empty for plain instruct models like Llama.
+    params: dict = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -59,6 +69,7 @@ def load_config(path: Path | None = None) -> Config:
             family=m.get("family", "unknown"),
             tier=m.get("tier", "production"),
             weights=m.get("weights", "open"),
+            params=m.get("params") or {},
         )
         for m in raw["models"]
     ]

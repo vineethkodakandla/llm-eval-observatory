@@ -11,6 +11,31 @@ import re
 
 _NUM_RE = re.compile(r"-?\d[\d,]*\.?\d*")
 
+# Reasoning models (Qwen, DeepSeek, …) emit their chain-of-thought inline,
+# wrapped in <think>…</think>, before the actual answer. That reasoning is not
+# the model's answer and must never reach a string-match grader — left in, it
+# both mis-scores capability and trips robustness leak-markers (a model that
+# *thinks* about the canary while refusing would be wrongly counted as leaking).
+# We strip it here so every grader sees only the model's real output. Providers
+# that already separate reasoning into its own field (e.g. gpt-oss) are
+# unaffected — there's simply nothing to strip.
+_THINK_RE = re.compile(r"<think(?:ing)?>.*?</think(?:ing)?>", re.IGNORECASE | re.DOTALL)
+_OPEN_THINK_RE = re.compile(r"<think(?:ing)?>.*\Z", re.IGNORECASE | re.DOTALL)
+
+
+def strip_reasoning(text: str) -> str:
+    """Remove <think>…</think> reasoning blocks from a model response.
+
+    Handles a truncated/unclosed block too: if generation was cut off mid-think
+    (an open <think> with no close), everything from it onward is reasoning with
+    no answer, so we drop it — the response correctly grades as a non-answer.
+    """
+    if not text:
+        return text
+    text = _THINK_RE.sub("", text)
+    text = _OPEN_THINK_RE.sub("", text)
+    return text.strip()
+
 
 def extract_final_answer(text: str) -> str:
     """Pull the model's final answer out of free-form text.
@@ -20,6 +45,7 @@ def extract_final_answer(text: str) -> str:
       2. the last \\boxed{...} if present,
       3. the whole last non-empty line.
     """
+    text = strip_reasoning(text)
     if not text:
         return ""
     m = re.search(r"(?:final answer|answer)\s*[:\-]\s*(.+)", text, re.IGNORECASE)

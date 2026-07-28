@@ -168,9 +168,13 @@ def _print_summary(s: dict) -> None:
     if "judge" in t:
         print("Judge (agreement w/ human | order-flip | verbosity bias):")
         for m in t["judge"]["per_judge"]:
+            # bias/flip_rate can be None if a judge returned no parseable
+            # verdicts (e.g. every response truncated) — print, don't crash.
+            bias = m["verbosity_bias"]["bias"]
+            bias_s = f"{bias:+.2f}" if bias is not None else " n/a"
             print(f"  {m['label']:<16} {m['agreement_with_human']:.0%}  | "
                   f"flip {m['position_bias']['flip_rate']:.0%} | "
-                  f"verb {m['verbosity_bias']['bias']:+.2f}")
+                  f"verb {bias_s}")
         fk = t["judge"]["inter_rater"]["fleiss_kappa"]
         print(f"  inter-rater Fleiss' kappa: {fk}")
     print("========================================")

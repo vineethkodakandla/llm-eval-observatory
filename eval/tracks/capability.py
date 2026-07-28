@@ -56,6 +56,7 @@ def _run_model(client: GroqClient, cfg: Config, spec: ModelSpec,
             comp = client.chat(
                 spec.id, messages,
                 temperature=cfg.temperature, max_tokens=cfg.max_tokens,
+                extra_params=spec.params,
                 mock_hint={"type": "capability", "gold": it["answer"]},
             )
             ok = grade(comp.text, it["answer"], it.get("kind", "exact"))

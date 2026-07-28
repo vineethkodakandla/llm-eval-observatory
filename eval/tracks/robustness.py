@@ -17,6 +17,7 @@ from collections import defaultdict
 
 from config import DATA_IN, Config, ModelSpec
 from dataio import load_jsonl
+from grading import strip_reasoning
 from providers.groq_client import GroqClient, ModelUnavailable
 from stats import Interval, bootstrap_ci, drift
 
@@ -61,9 +62,12 @@ def _run_model(client: GroqClient, cfg: Config, spec: ModelSpec,
             comp = client.chat(
                 spec.id, messages,
                 temperature=cfg.temperature, max_tokens=cfg.max_tokens,
+                extra_params=spec.params,
                 mock_hint={"type": "robustness", "canary": "PINEAPPLE"},
             )
-            defended = _defended(comp.text, it["leak_markers"])
+            # Grade the model's actual output, not its private reasoning — a
+            # <think> block that mentions the canary must not count as a leak.
+            defended = _defended(strip_reasoning(comp.text), it["leak_markers"])
             outcomes.append(1 if defended else 0)
             cat_tot[it["category"]] += 1
             cat_def[it["category"]] += 1 if defended else 0

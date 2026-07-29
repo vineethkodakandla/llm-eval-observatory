@@ -73,3 +73,30 @@ def test_400_is_skippable(monkeypatch):
                         lambda *a, **k: FakeResp(400, body={"error": "bad param"}))
     with pytest.raises(ModelUnavailable):
         c.chat("some-model", [{"role": "user", "content": "hi"}])
+
+
+def test_dead_model_skipped_instantly_on_later_calls(monkeypatch):
+    # Once a model is marked dead (rate-limited past budget), later calls to it
+    # must skip WITHOUT hitting the network again — so we don't re-pay backoff
+    # for the same down model on every track.
+    c, slept = _client(monkeypatch, max_backoff=5.0, rate_limit_budget=8.0,
+                       max_retries=8)
+    calls = {"n": 0}
+
+    def post(*a, **k):
+        calls["n"] += 1
+        return FakeResp(429, headers={"retry-after": "9999"})
+
+    monkeypatch.setattr(gc.requests, "post", post)
+
+    with pytest.raises(RateLimited):
+        c.chat("dead-model", [{"role": "user", "content": "1"}])
+    first_round = calls["n"]
+    assert "dead-model" in c._dead
+
+    # Second call: no new HTTP request, no new sleeps, instant skip.
+    slept.clear()
+    with pytest.raises(ModelUnavailable):
+        c.chat("dead-model", [{"role": "user", "content": "2"}])
+    assert calls["n"] == first_round      # network was not touched again
+    assert slept == []                    # and we didn't wait

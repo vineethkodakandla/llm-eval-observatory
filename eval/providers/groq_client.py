@@ -48,7 +48,7 @@ class Completion:
 class GroqClient:
     def __init__(self, endpoint: str, *, mock: bool | None = None,
                  timeout: int = 60, max_retries: int = 5, min_interval: float = 0.35,
-                 max_backoff: float = 30.0, rate_limit_budget: float = 180.0):
+                 max_backoff: float = 30.0, rate_limit_budget: float = 120.0):
         self.endpoint = endpoint
         self.timeout = timeout
         self.max_retries = max_retries
@@ -61,6 +61,10 @@ class GroqClient:
         self.max_backoff = max_backoff
         self.rate_limit_budget = rate_limit_budget
         self._last_call = 0.0
+        # Models that 404'd / 400'd / stayed rate-limited earlier this run. Once
+        # a model is in here we skip it instantly on later tracks instead of
+        # paying the full backoff budget again for a model we know is down.
+        self._dead: set[str] = set()
         env_mock = os.environ.get("EVAL_MOCK", "").lower() in ("1", "true", "yes")
         self.mock = env_mock if mock is None else mock
         # Optional salt so backfilled mock runs wander day-to-day (demo history).
@@ -95,6 +99,8 @@ class GroqClient:
     # -- live path ----------------------------------------------------------
     def _live(self, model, messages, temperature, max_tokens,
               extra_params=None) -> Completion:
+        if model in self._dead:
+            raise ModelUnavailable(f"model '{model}' already unavailable this run — skipping")
         self._throttle()
         payload = {
             "model": model,
@@ -143,10 +149,12 @@ class GroqClient:
                     model=model,
                 )
             if r.status_code == 404:
+                self._dead.add(model)
                 raise ModelUnavailable(f"model '{model}' not found (404): {r.text[:200]}")
             if r.status_code == 400:
                 # A request the model rejects (e.g. an unsupported parameter):
                 # skip this model rather than aborting the entire run.
+                self._dead.add(model)
                 raise ModelUnavailable(f"model '{model}' rejected request (400): {r.text[:200]}")
             if r.status_code == 429:
                 rate_limited = True
@@ -160,6 +168,7 @@ class GroqClient:
                     retry_after = backoff
                 wait = min(retry_after, self.max_backoff)
                 if self._rl_wait + wait > self.rate_limit_budget:
+                    self._dead.add(model)
                     raise RateLimited(
                         f"model '{model}' still rate-limited after "
                         f"{self._rl_wait:.0f}s of 429 backoff — skipping it")
@@ -175,6 +184,7 @@ class GroqClient:
         # Retries exhausted. If the last failures were 429s, skip the model
         # rather than crashing the whole run.
         if rate_limited:
+            self._dead.add(model)
             raise RateLimited(f"model '{model}' rate-limited past {self.max_retries} retries — skipping it")
         raise GroqError(f"exhausted {self.max_retries} retries for model '{model}'")
 

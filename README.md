@@ -30,7 +30,7 @@ single LLM judge.
 
 ```
                  ┌──────────────────────────────┐
-   12-hourly cron│   GitHub Action (engine)      │   commits results
+   nightly cron  │   GitHub Action (engine)      │   commits results
   ───────────────▶  eval/run_eval.py             ├───────────────────┐
                  │   • autopilot (AML triage)    │                   │
                  │   • capability  • robustness  │                   ▼

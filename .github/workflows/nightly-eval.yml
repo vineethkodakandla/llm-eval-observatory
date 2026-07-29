@@ -6,12 +6,17 @@ name: nightly-eval
 
 on:
   schedule:
-    # Every 12 hours (00:00 and 12:00 UTC). Four runs/day of ~640 calls each
-    # overran Groq's free-tier limits and the runs stalled on rate-limit
-    # backoff; twice a day keeps the dashboard fresh while staying within quota.
-    # GitHub may delay scheduled runs under load; a missed slot just means the
-    # next one refreshes it.
-    - cron: "0 */12 * * *"
+    # Once a day at 00:30 UTC. Rationale:
+    #   * Groq's free-tier DAILY quota resets at 00:00 UTC — running at 00:30
+    #     means the run always starts with fresh quota, so it never fails just
+    #     because an earlier run spent the day's budget. (Twice-daily at 12h
+    #     overran the quota once the 4th/autopilot track pushed each run to
+    #     ~770 calls, and every model 429'd — see run 30474931921.)
+    #   * The 30-min offset (not 00:00) avoids racing the quota reset and the
+    #     usual GitHub scheduled-run start delay under load.
+    # A missed slot just means the next night refreshes it; the run also refuses
+    # to overwrite good data with an all-skipped snapshot, so a bad night is safe.
+    - cron: "30 0 * * *"
   workflow_dispatch: {}   # lets you trigger a run by hand from the Actions tab
 
 # Never let two runs overlap (they'd race on the results commit).

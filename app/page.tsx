@@ -68,7 +68,7 @@ function Footer({
             How it works
           </h3>
           <p className="text-xs leading-relaxed">
-            A scheduled GitHub Action runs the eval suite twice a day against {provider}&apos;s
+            A scheduled GitHub Action runs the eval suite nightly against {provider}&apos;s
             free tier, computes the statistics, and commits the results JSON to this repo.
             This site reads that file — so the dashboard is the artifact, not a screenshot
             of one. The flagship track measures an <span className="text-slate-300">autopilot

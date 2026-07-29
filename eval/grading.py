@@ -106,3 +106,59 @@ def grade(prediction: str, gold: str, kind: str = "exact") -> bool:
         return True
     # accept gold as a standalone token within the prediction line
     return bool(re.search(rf"\b{re.escape(ng)}\b", np_))
+
+
+# --- structured-decision parsing (autopilot track) ------------------------
+# The autopilot track asks each model to end its reply with a fixed four-line
+# block (DECISION / TYPOLOGY / RULE / EVIDENCE). Parsing is deterministic — no
+# LLM grades another LLM here — so the decision, grounding, and escalation
+# numbers are reproducible from the raw text, exactly like the other tracks.
+
+_DECISIONS = ("ESCALATE", "CLEAR", "REVIEW")
+_TYPOLOGIES = ("STRUCTURING", "SANCTIONS", "PEP", "LAYERING",
+               "TERRORIST_FINANCING", "NONE")
+
+
+def _last_labeled(text: str, label: str) -> str:
+    """Return the value of the LAST `LABEL: value` line (models sometimes
+    restate the block; the final one is the committed answer). Tolerates
+    markdown bullets/bold around the label."""
+    pat = re.compile(rf"^[\s>*_\-]*{label}\s*[:\-]\s*(.+?)\s*$",
+                     re.IGNORECASE | re.MULTILINE)
+    hits = pat.findall(text)
+    return hits[-1].strip() if hits else ""
+
+
+def _pick_decision(val: str) -> str:
+    up = val.upper()
+    found = [(up.find(d), d) for d in _DECISIONS if re.search(rf"\b{d}\b", up)]
+    found = [(i, d) for i, d in found if i >= 0]
+    if not found:
+        return ""
+    found.sort()          # first decision word by position wins
+    return found[0][1]
+
+
+def parse_decision_block(text: str) -> dict:
+    """Extract the autopilot answer block from a model's free-form reply.
+
+    Returns a dict: {"decision", "typology", "rule", "evidence": [ids]}.
+    Missing/unparseable fields come back empty ("" / "NONE" / []), which the
+    track scores as a wrong or ungrounded answer rather than crashing.
+    """
+    text = strip_reasoning(text or "")
+    decision = _pick_decision(_last_labeled(text, "DECISION"))
+
+    typ_up = _last_labeled(text, "TYPOLOGY").upper()
+    typology = next((t for t in _TYPOLOGIES if t in typ_up), "NONE")
+
+    rule_m = re.search(r"P\d+", _last_labeled(text, "RULE").upper())
+    rule = rule_m.group(0) if rule_m else "NONE"
+
+    evidence = re.findall(r"E\d+", _last_labeled(text, "EVIDENCE").upper())
+    # de-dupe, preserve order
+    seen: set[str] = set()
+    evidence = [e for e in evidence if not (e in seen or seen.add(e))]
+
+    return {"decision": decision, "typology": typology,
+            "rule": rule, "evidence": evidence}

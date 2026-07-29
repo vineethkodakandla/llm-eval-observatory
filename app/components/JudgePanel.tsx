@@ -26,7 +26,7 @@ export default function JudgePanel({
   return (
     <Section
       id="judge"
-      eyebrow="Track 3"
+      eyebrow="Track 4 · can you trust automated grading?"
       title="LLM-as-judge bias & reliability"
       blurb={`Judges are themselves unreliable, so this track quantifies how. Each model judges ${track.n_items} pairwise items against held-out human labels, in both presentation orders. We measure agreement with the human, position bias (how often the verdict flips when we swap order — an unbiased judge never flips), and verbosity bias (tendency to pick the longer answer; the set is length-balanced so 0 is neutral).`}
     >

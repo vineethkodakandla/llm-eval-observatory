@@ -23,9 +23,14 @@ from datetime import datetime, timezone
 from config import (HISTORY_PATH, LATEST_PATH, git_repo, git_sha, load_config)
 from dataio import append_jsonl, load_jsonl
 from providers.groq_client import GroqClient
-from tracks import capability, judge, robustness
+from tracks import autopilot, capability, judge, robustness
 
+# Autopilot runs first: it's the flagship track, and on quota-tight free-tier
+# days the engine skips a rate-limited model for the rest of the run — running
+# this one first means the "can you trust the autopilot" numbers are the last
+# thing to be starved, not the first.
 TRACKS = {
+    "autopilot": autopilot,
     "capability": capability,
     "robustness": robustness,
     "judge": judge,
@@ -137,6 +142,15 @@ def _history_record(s: dict) -> dict:
         "generated_at": s["generated_at"], "git_sha": s["git_sha"],
         "mock": s["mock"],
     }
+    if "autopilot" in t:
+        rec["autopilot"] = {
+            m["model"]: {
+                "accuracy": m["accuracy"],
+                "false_clear_rate": m["false_clear_rate"],
+                "faithfulness": m["faithfulness"],
+            }
+            for m in t["autopilot"]["per_model"]
+        }
     if "capability" in t:
         rec["capability"] = {
             m["model"]: {"accuracy": m["accuracy"], "ci95": m["ci95"]}
@@ -163,6 +177,17 @@ def _history_record(s: dict) -> dict:
 def _print_summary(s: dict) -> None:
     print("\n================ SUMMARY ================")
     t = s["tracks"]
+    if "autopilot" in t:
+        print("Autopilot - KYC/AML triage (decision acc | false-clears | "
+              "grounding | over-esc):")
+        for m in t["autopilot"]["per_model"]:
+            def _p(x):
+                return f"{x:.0%}" if isinstance(x, (int, float)) else " n/a"
+            flag = "  <DRIFT>" if m.get("drift", {}).get("flag") else ""
+            print(f"  {m['label']:<16} {m['accuracy']:.0%}  | "
+                  f"fc {_p(m['false_clear_rate'])} | "
+                  f"grnd {_p(m['faithfulness'])} | "
+                  f"over {_p(m['over_escalation_rate'])}{flag}")
     if "capability" in t:
         print("Capability (accuracy, 95% CI):")
         for m in t["capability"]["per_model"]:

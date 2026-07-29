@@ -47,7 +47,7 @@ export async function getHistory(): Promise<HistoryRecord[]> {
 /** Build a per-model time series for one metric from the run history. */
 export function seriesFor(
   history: HistoryRecord[],
-  track: "capability" | "robustness" | "judge",
+  track: "autopilot" | "capability" | "robustness" | "judge",
   metric: string,
   mock: boolean
 ): { x: string[]; series: Record<string, (number | null)[]> } {

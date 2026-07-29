@@ -61,6 +61,30 @@ export interface InterRater {
   note?: string;
 }
 
+export interface AutopilotModel {
+  model: string;
+  label: string;
+  family: string;
+  n: number;
+  accuracy: number; // decision accuracy (escalate/clear/review)
+  ci95: CI;
+  drift: Drift;
+  typology_accuracy: number | null; // right ML pattern named on escalations
+  faithfulness: number | null; // cited evidence real AND relevant
+  hallucinated_citation_rate: number | null; // cited a non-existent evidence id
+  false_clear_rate: number | null; // gold ESCALATE but the model CLEARED it
+  over_escalation_rate: number | null; // gold CLEAR but the model escalated
+  abstention_accuracy: number | null; // correctly sent ambiguous cases to REVIEW
+  by_category: Record<string, number>;
+  sample_failures: {
+    id: string;
+    category: string;
+    gold: string;
+    got: string;
+    false_clear: boolean;
+  }[];
+}
+
 export interface Snapshot {
   schema_version: number;
   status: "ok" | "awaiting_first_run";
@@ -75,6 +99,12 @@ export interface Snapshot {
   duration_sec: number;
   totals: { api_calls: number; prompt_tokens: number; completion_tokens: number };
   tracks: {
+    autopilot?: {
+      n_cases: number;
+      categories: string[];
+      escalate_base_rate: number;
+      per_model: AutopilotModel[];
+    };
     capability?: { n_items: number; categories: string[]; per_model: CapModel[] };
     robustness?: { n_attacks: number; categories: string[]; per_model: RobModel[] };
     judge?: {
@@ -94,6 +124,10 @@ export interface HistoryRecord {
   generated_at: string;
   git_sha: string;
   mock: boolean;
+  autopilot?: Record<
+    string,
+    { accuracy: number; false_clear_rate: number | null; faithfulness: number | null }
+  >;
   capability?: Record<string, { accuracy: number; ci95: number[] }>;
   robustness?: Record<string, { defense_rate: number; ci95: number[] }>;
   judge?: Record<string, { agreement: number; flip_rate: number; verbosity_bias: number }>;

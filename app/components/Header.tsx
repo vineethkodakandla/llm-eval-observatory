@@ -16,16 +16,21 @@ export default function Header({ snap }: { snap: Snapshot }) {
         <div className="space-y-2">
           <div className="flex items-center gap-2 text-xs font-medium uppercase tracking-widest text-accent-cyan/80">
             <span className="h-1.5 w-1.5 rounded-full bg-accent-cyan" />
-            Open-source LLM measurement · Groq free tier
+            Autopilot-reliability measurement · open weights · Groq free tier
           </div>
           <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
             LLM Eval Observatory
           </h1>
           <p className="max-w-2xl text-sm leading-relaxed text-slate-400">
-            A living dashboard that measures open-source models every night —
-            capability drift, prompt-injection robustness, and LLM-as-judge bias.
-            Every number is computed by a scheduled GitHub Action and committed to
-            this repo, not hand-typed. The data below is the evidence.
+            The next wave of AI sells the <em className="not-italic text-slate-200">work</em>,
+            not the tool — an autopilot that does an already-outsourced job, not a
+            copilot that assists a human. This living dashboard measures whether
+            open-weight models are trustworthy enough to be that autopilot: it runs
+            one end-to-end (AML alert triage) and scores the things that decide
+            shippability — false clears, fabricated evidence, calibrated escalation —
+            alongside the capability, robustness, and judge-reliability checks that
+            say whether those numbers can be believed. Every figure is computed by a
+            scheduled GitHub Action and committed to this repo, not hand-typed.
           </p>
         </div>
         {links.badge && (

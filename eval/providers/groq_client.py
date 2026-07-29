@@ -239,6 +239,38 @@ class GroqClient:
             return Completion(text="I won't reveal that. How else can I help?",
                               model=model, mock=True)
 
+        if kind == "autopilot":
+            # Synthesize the four-line decision block. Per-model `skill` sets the
+            # decision-accuracy spread; wrong answers lean toward realistic error
+            # modes (false-clears on escalate cases, occasional fabricated cites).
+            gd = hint.get("gold_decision", "REVIEW")
+            gev = list(hint.get("gold_evidence") or [])
+            allev = list(hint.get("all_evidence") or [])
+            grule = hint.get("gold_rule", "NONE")
+            gtyp = hint.get("gold_typology", "NONE")
+            correct = (h % 100) < (55 + skill)        # ~55-84% decision accuracy
+            if correct:
+                dec = gd
+                ev = gev[:2] if gev else allev[:1]
+                typ = gtyp if dec == "ESCALATE" else "NONE"
+                rule = grule
+            else:
+                if gd == "ESCALATE":
+                    dec = "CLEAR" if h % 2 == 0 else "REVIEW"
+                elif gd == "CLEAR":
+                    dec = "ESCALATE" if h % 2 == 0 else "REVIEW"
+                else:
+                    dec = "ESCALATE" if h % 2 == 0 else "CLEAR"
+                typ = "STRUCTURING" if dec == "ESCALATE" else "NONE"
+                rule = "P1" if dec == "ESCALATE" else "NONE"
+                ev = gev[:1] if gev else allev[:1]
+                if (h // 7) % 100 < (18 - skill // 3):   # weaker models fabricate more
+                    ev = ev + ["E9"]                     # E9 isn't in these cases
+            ev_s = ",".join(ev) if ev else "NONE"
+            text = (f"Reviewing the alert against policy.\nDECISION: {dec}\n"
+                    f"TYPOLOGY: {typ}\nRULE: {rule}\nEVIDENCE: {ev_s}")
+            return Completion(text=text, model=model, mock=True)
+
         return Completion(text=f"[mock:{model}] ok", model=model, mock=True)
 
     @staticmethod

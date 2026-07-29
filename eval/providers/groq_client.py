@@ -29,6 +29,13 @@ class ModelUnavailable(GroqError):
     catalog change). One bad model must never take the nightly run down."""
 
 
+class RateLimited(ModelUnavailable):
+    """Raised when a model stays rate-limited past our wait budget. Subclasses
+    ModelUnavailable so the tracks skip that model (rather than hang or crash):
+    on the free tier one model exhausting its quota shouldn't stall the run —
+    the others still get evaluated and the dashboard shows partial results."""
+
+
 @dataclass
 class Completion:
     text: str
@@ -40,11 +47,19 @@ class Completion:
 
 class GroqClient:
     def __init__(self, endpoint: str, *, mock: bool | None = None,
-                 timeout: int = 60, max_retries: int = 5, min_interval: float = 0.35):
+                 timeout: int = 60, max_retries: int = 5, min_interval: float = 0.35,
+                 max_backoff: float = 30.0, rate_limit_budget: float = 180.0):
         self.endpoint = endpoint
         self.timeout = timeout
         self.max_retries = max_retries
         self.min_interval = min_interval  # crude client-side rate limiting
+        # Cap any single backoff sleep, and cap total time spent waiting on 429s
+        # for one model. Groq's free tier can return a huge Retry-After when a
+        # quota is hit; without these caps a single sleep would silently hang the
+        # whole run until CI's job timeout kills it (observed: 60-min "cancelled"
+        # runs). Past the budget we give up on this model and move on.
+        self.max_backoff = max_backoff
+        self.rate_limit_budget = rate_limit_budget
         self._last_call = 0.0
         env_mock = os.environ.get("EVAL_MOCK", "").lower() in ("1", "true", "yes")
         self.mock = env_mock if mock is None else mock
@@ -95,7 +110,14 @@ class GroqClient:
             payload["messages"] = messages
         headers = {"Authorization": f"Bearer {self.api_key}",
                    "Content-Type": "application/json"}
+        # Track cumulative time spent waiting on 429s for THIS model. Reset when
+        # the model changes (the tracks evaluate one model to completion before
+        # the next), so a fresh model always gets its full budget.
+        if getattr(self, "_rl_model", None) != model:
+            self._rl_model = model
+            self._rl_wait = 0.0
         backoff = 2.0
+        rate_limited = False
         for attempt in range(1, self.max_retries + 1):
             try:
                 r = requests.post(self.endpoint, json=payload, headers=headers,
@@ -127,16 +149,33 @@ class GroqClient:
                 # skip this model rather than aborting the entire run.
                 raise ModelUnavailable(f"model '{model}' rejected request (400): {r.text[:200]}")
             if r.status_code == 429:
-                # Respect Retry-After when present, else exponential backoff.
-                wait = float(r.headers.get("retry-after", backoff))
+                rate_limited = True
+                # Respect Retry-After but CAP it — Groq can return a very large
+                # value when a quota is hit, and an uncapped sleep would hang the
+                # whole run. Once cumulative 429 waiting for this model exceeds
+                # the budget, stop waiting and skip the model (RateLimited).
+                try:
+                    retry_after = float(r.headers.get("retry-after", backoff))
+                except (TypeError, ValueError):
+                    retry_after = backoff
+                wait = min(retry_after, self.max_backoff)
+                if self._rl_wait + wait > self.rate_limit_budget:
+                    raise RateLimited(
+                        f"model '{model}' still rate-limited after "
+                        f"{self._rl_wait:.0f}s of 429 backoff — skipping it")
                 time.sleep(wait)
-                backoff = min(backoff * 2, 60)
+                self._rl_wait += wait
+                backoff = min(backoff * 2, self.max_backoff)
                 continue
             if 500 <= r.status_code < 600:
-                time.sleep(backoff)
-                backoff *= 2
+                time.sleep(min(backoff, self.max_backoff))
+                backoff = min(backoff * 2, self.max_backoff)
                 continue
             raise GroqError(f"HTTP {r.status_code}: {r.text[:300]}")
+        # Retries exhausted. If the last failures were 429s, skip the model
+        # rather than crashing the whole run.
+        if rate_limited:
+            raise RateLimited(f"model '{model}' rate-limited past {self.max_retries} retries — skipping it")
         raise GroqError(f"exhausted {self.max_retries} retries for model '{model}'")
 
     def _throttle(self) -> None:

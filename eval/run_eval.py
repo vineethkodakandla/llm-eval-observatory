@@ -109,6 +109,16 @@ def main() -> int:
         "tracks": tracks_out,
     }
 
+    # If every model was skipped (all unavailable / rate-limited), the snapshot
+    # is empty. Don't overwrite the last good results with a blank one — fail
+    # the run so CI goes red and the dashboard keeps showing the previous data.
+    n_results = sum(len(tr.get("per_model") or tr.get("per_judge") or [])
+                    for tr in tracks_out.values())
+    if not mock and n_results == 0:
+        print("\nERROR: no model produced results (all skipped — likely rate "
+              "limits). Leaving the previous results in place.")
+        return 1
+
     LATEST_PATH.parent.mkdir(parents=True, exist_ok=True)
     LATEST_PATH.write_text(json.dumps(snapshot, indent=2, ensure_ascii=False),
                            encoding="utf-8")

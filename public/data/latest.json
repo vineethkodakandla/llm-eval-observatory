@@ -2,10 +2,10 @@
   "schema_version": 1,
   "status": "ok",
   "mock": false,
-  "generated_at": "2026-08-03T04:04:16.160476Z",
-  "run_id": "2026-08-03T04:04:16Z",
-  "date": "2026-08-03",
-  "git_sha": "721d0ddcd1a5a8587497c25a9009b1009f5aeed6",
+  "generated_at": "2026-08-04T03:45:39.219152Z",
+  "run_id": "2026-08-04T03:45:39Z",
+  "date": "2026-08-04",
+  "git_sha": "f42d1d79650871a841d0295046ac399e5b14df16",
   "git_repo": "vineethkodakandla/llm-eval-observatory",
   "provider": "groq",
   "models": [
@@ -45,11 +45,11 @@
       "weights": "open"
     }
   ],
-  "duration_sec": 771.7,
+  "duration_sec": 776.5,
   "totals": {
-    "api_calls": 189,
-    "prompt_tokens": 71819,
-    "completion_tokens": 31828
+    "api_calls": 194,
+    "prompt_tokens": 75366,
+    "completion_tokens": 34140
   },
   "tracks": {
     "autopilot": {
@@ -129,9 +129,9 @@
             "math": 1.0
           },
           "drift": {
-            "delta": -0.02,
+            "delta": 0.0,
             "flag": false,
-            "direction": "down",
+            "direction": "flat",
             "ci_disjoint": false
           }
         }
@@ -195,9 +195,9 @@
             }
           ],
           "drift": {
-            "delta": -0.0333,
+            "delta": 0.0,
             "flag": false,
-            "direction": "down",
+            "direction": "flat",
             "ci_disjoint": false
           }
         }

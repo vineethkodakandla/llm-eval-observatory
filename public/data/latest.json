@@ -2,10 +2,10 @@
   "schema_version": 1,
   "status": "ok",
   "mock": false,
-  "generated_at": "2026-08-04T03:45:39.219152Z",
-  "run_id": "2026-08-04T03:45:39Z",
-  "date": "2026-08-04",
-  "git_sha": "f42d1d79650871a841d0295046ac399e5b14df16",
+  "generated_at": "2026-08-05T03:41:51.121632Z",
+  "run_id": "2026-08-05T03:41:51Z",
+  "date": "2026-08-05",
+  "git_sha": "c45f555d00979fcf78a996db2fc40102e14d06d8",
   "git_repo": "vineethkodakandla/llm-eval-observatory",
   "provider": "groq",
   "models": [
@@ -45,11 +45,11 @@
       "weights": "open"
     }
   ],
-  "duration_sec": 776.5,
+  "duration_sec": 760.0,
   "totals": {
     "api_calls": 194,
-    "prompt_tokens": 75366,
-    "completion_tokens": 34140
+    "prompt_tokens": 75771,
+    "completion_tokens": 35411
   },
   "tracks": {
     "autopilot": {

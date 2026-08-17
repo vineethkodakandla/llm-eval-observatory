@@ -2,10 +2,10 @@
   "schema_version": 1,
   "status": "ok",
   "mock": false,
-  "generated_at": "2026-08-16T02:02:04.941650Z",
-  "run_id": "2026-08-16T02:02:04Z",
-  "date": "2026-08-16",
-  "git_sha": "3221457a393248418b338305f98aedc86b617dd1",
+  "generated_at": "2026-08-17T01:59:20.583011Z",
+  "run_id": "2026-08-17T01:59:20Z",
+  "date": "2026-08-17",
+  "git_sha": "caba0049cd64963d0908945dedcd0d40ab8200aa",
   "git_repo": "vineethkodakandla/llm-eval-observatory",
   "provider": "groq",
   "models": [
@@ -45,11 +45,11 @@
       "weights": "open"
     }
   ],
-  "duration_sec": 932.7,
+  "duration_sec": 963.6,
   "totals": {
-    "api_calls": 364,
-    "prompt_tokens": 104504,
-    "completion_tokens": 50453
+    "api_calls": 363,
+    "prompt_tokens": 103874,
+    "completion_tokens": 50135
   },
   "tracks": {
     "autopilot": {
@@ -104,10 +104,10 @@
           "label": "GPT-OSS 120B",
           "family": "OpenAI OSS",
           "n": 26,
-          "accuracy": 0.9615,
+          "accuracy": 1.0,
           "ci95": [
-            0.9615,
-            0.8846,
+            1.0,
+            1.0,
             1.0
           ],
           "typology_accuracy": 1.0,
@@ -115,9 +115,9 @@
           "hallucinated_citation_rate": 0.0,
           "false_clear_rate": 0.0,
           "over_escalation_rate": 0.0,
-          "abstention_accuracy": 0.75,
+          "abstention_accuracy": 1.0,
           "by_category": {
-            "ambiguous": 0.75,
+            "ambiguous": 1.0,
             "benign_ctr": 1.0,
             "benign_profile": 1.0,
             "layering": 1.0,
@@ -125,19 +125,11 @@
             "sanctions": 1.0,
             "structuring": 1.0
           },
-          "sample_failures": [
-            {
-              "id": "kyc-023",
-              "category": "ambiguous",
-              "gold": "REVIEW",
-              "got": "CLEAR",
-              "false_clear": false
-            }
-          ],
+          "sample_failures": [],
           "drift": {
-            "delta": -0.0385,
+            "delta": 0.0385,
             "flag": false,
-            "direction": "down",
+            "direction": "up",
             "ci_disjoint": false
           }
         }
@@ -182,23 +174,23 @@
           "label": "Llama 3.3 70B",
           "family": "Meta Llama",
           "n": 50,
-          "correct": 48,
-          "accuracy": 0.96,
+          "correct": 49,
+          "accuracy": 0.98,
           "ci95": [
-            0.96,
-            0.9,
+            0.98,
+            0.94,
             1.0
           ],
           "by_category": {
             "factual": 1.0,
             "instruction": 0.9,
-            "logic": 0.9167,
+            "logic": 1.0,
             "math": 1.0
           },
           "drift": {
-            "delta": -0.02,
+            "delta": 0.02,
             "flag": false,
-            "direction": "down",
+            "direction": "up",
             "ci_disjoint": false
           }
         }
@@ -246,9 +238,9 @@
             }
           ],
           "drift": {
-            "delta": 0.0334,
+            "delta": 0.0,
             "flag": false,
-            "direction": "up",
+            "direction": "flat",
             "ci_disjoint": false
           }
         },
@@ -297,9 +289,9 @@
             }
           ],
           "drift": {
-            "delta": -0.0333,
+            "delta": 0.0,
             "flag": false,
-            "direction": "down",
+            "direction": "flat",
             "ci_disjoint": false
           }
         }

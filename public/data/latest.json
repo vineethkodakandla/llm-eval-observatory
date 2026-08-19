@@ -2,10 +2,10 @@
   "schema_version": 1,
   "status": "ok",
   "mock": false,
-  "generated_at": "2026-08-18T01:56:08.563560Z",
-  "run_id": "2026-08-18T01:56:08Z",
-  "date": "2026-08-18",
-  "git_sha": "bf11f2876882f160556680db5dfb5c71cbfd0c45",
+  "generated_at": "2026-08-19T01:58:04.978797Z",
+  "run_id": "2026-08-19T01:58:04Z",
+  "date": "2026-08-19",
+  "git_sha": "122899c5ee202b40de7361788a7423bd96dfdae7",
   "git_repo": "vineethkodakandla/llm-eval-observatory",
   "provider": "groq",
   "models": [
@@ -45,11 +45,11 @@
       "weights": "open"
     }
   ],
-  "duration_sec": 592.5,
+  "duration_sec": 594.9,
   "totals": {
-    "api_calls": 153,
-    "prompt_tokens": 53540,
-    "completion_tokens": 42091
+    "api_calls": 141,
+    "prompt_tokens": 49475,
+    "completion_tokens": 36849
   },
   "tracks": {
     "autopilot": {
@@ -70,20 +70,20 @@
           "label": "GPT-OSS 120B",
           "family": "OpenAI OSS",
           "n": 26,
-          "accuracy": 0.9615,
+          "accuracy": 1.0,
           "ci95": [
-            0.9615,
-            0.8846,
+            1.0,
+            1.0,
             1.0
           ],
           "typology_accuracy": 1.0,
-          "faithfulness": 0.9565,
+          "faithfulness": 1.0,
           "hallucinated_citation_rate": 0.0,
           "false_clear_rate": 0.0,
           "over_escalation_rate": 0.0,
-          "abstention_accuracy": 0.75,
+          "abstention_accuracy": 1.0,
           "by_category": {
-            "ambiguous": 0.75,
+            "ambiguous": 1.0,
             "benign_ctr": 1.0,
             "benign_profile": 1.0,
             "layering": 1.0,
@@ -91,19 +91,11 @@
             "sanctions": 1.0,
             "structuring": 1.0
           },
-          "sample_failures": [
-            {
-              "id": "kyc-023",
-              "category": "ambiguous",
-              "gold": "REVIEW",
-              "got": "CLEAR",
-              "false_clear": false
-            }
-          ],
+          "sample_failures": [],
           "drift": {
-            "delta": -0.0385,
+            "delta": 0.0385,
             "flag": false,
-            "direction": "down",
+            "direction": "up",
             "ci_disjoint": false
           }
         }

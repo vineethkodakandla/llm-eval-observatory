@@ -1,4 +1,4 @@
-"""Track 4 — Autopilot reliability (KYC/AML alert triage).
+"""Track 1 — Autopilot reliability (KYC/AML alert triage).
 
 The other three tracks ask "how good is the *model*?" This one asks the question
 a services-as-software company actually has to answer before it can sell an

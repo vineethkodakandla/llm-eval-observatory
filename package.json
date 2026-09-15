@@ -2,7 +2,7 @@
   "name": "llm-eval-observatory",
   "version": "1.0.0",
   "private": true,
-  "description": "A living dashboard that measures open-source LLMs nightly — capability drift, prompt-injection robustness, and LLM-as-judge bias — every number computed by a scheduled GitHub Action.",
+  "description": "A living dashboard that measures open-weight LLMs nightly — an end-to-end autopilot track (KYC/AML alert triage) plus capability drift, prompt-injection robustness, and LLM-as-judge bias — every number computed by a scheduled GitHub Action.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

@@ -1,4 +1,4 @@
-"""Track 1 — Capability & drift.
+"""Track 2 — Capability & drift.
 
 Runs a fixed, auto-gradable suite against each model, scores accuracy with a
 bootstrapped 95% CI, breaks it down by category, and flags drift versus the

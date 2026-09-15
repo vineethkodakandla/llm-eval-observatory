@@ -69,7 +69,7 @@ export function DriftBadge({ drift }: { drift: Drift }) {
           ? "border-accent-green/40 bg-accent-green/10 text-accent-green"
           : "border-accent-red/40 bg-accent-red/10 text-accent-red"
       }`}
-      title="Flagged: point moved >5pp AND the 95% CIs do not overlap"
+      title="Flagged: point moved ≥5pp AND the 95% CIs do not overlap"
     >
       {up ? "▲" : "▼"} {drift.delta >= 0 ? "+" : ""}
       {(drift.delta * 100).toFixed(1)}pp drift

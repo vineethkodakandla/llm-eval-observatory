@@ -14,7 +14,7 @@ export default function EmptyState() {
             console.groq.com/keys
           </a>
         </Step>
-        <Step n={2} text="Run the suite (about 5 minutes, free)">
+        <Step n={2} text="Run the suite (about 5 minutes per model, free)">
           <code className="block rounded bg-ink-850 px-3 py-2 font-mono text-xs text-slate-300">
             pip install -r eval/requirements.txt
             <br />

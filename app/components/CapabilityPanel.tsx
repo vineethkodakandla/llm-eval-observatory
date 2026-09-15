@@ -27,7 +27,7 @@ export default function CapabilityPanel({
       id="capability"
       eyebrow="Track 2 · is it competent?"
       title="Capability & drift"
-      blurb={`Accuracy on a fixed ${track.n_items}-item auto-graded suite (math, logic, instruction-following, factual recall). Bars show the point estimate; the faint band behind each is the bootstrapped 95% CI. A drift badge appears only when a model's score moves more than 5 points AND its CI no longer overlaps the previous run's — noise stays quiet.`}
+      blurb={`Accuracy on a fixed ${track.n_items}-item auto-graded suite (math, logic, instruction-following, factual recall). Bars show the point estimate; the faint band behind each is the bootstrapped 95% CI. A drift badge appears only when a model's score moves by at least 5 points AND its CI no longer overlaps the previous run's — noise stays quiet.`}
     >
       <div className="grid gap-4 lg:grid-cols-5">
         <div className="card overflow-hidden lg:col-span-3">

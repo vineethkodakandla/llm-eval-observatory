@@ -1,35 +1,42 @@
-# Models under test — ALL open-source weights, all on Groq's free tier.
+# Models under test: Groq *production* models with open weights, on the free tier.
+#
+# Refreshed 2026-09-15 from GET /models using the repo's own key (Actions run
+# 35011193148):
+#   * removed llama-3.3-70b-versatile and llama-3.1-8b-instant. Groq's
+#     deprecations page lists both as shut down on 2026-08-16, and every nightly
+#     run since 2026-08-18 got HTTP 404 for them.
+#   * removed qwen/qwen3.6-27b, a preview model. It was rate-limited (429) through
+#     2026-09-14 and gone from the catalog (404) on 2026-09-15. Its preview
+#     successor qwen/qwen3.8-27b is reachable but not added: preview IDs have been
+#     swapped twice since July (qwen3-32b -> qwen3.6-27b -> qwen3.8-27b).
+#   The two GPT-OSS sizes are the only production open-weight chat models left.
+#
+# Free-tier budget, per model:
+#   limits    1,000 requests/day and 8,000 tokens/min (Groq response headers),
+#             200,000 tokens/day (Groq rate-limit docs)
+#   one run   154-157 requests and 61-66K tokens (nightly snapshots 2026-09-05..15)
+# so the nightly run uses ~16% of the request allowance and ~33% of the token
+# allowance, leaving room for one manual re-run a day.
 #
 # Model IDs drift over time. To refresh, hit the live catalog:
 #   curl https://api.groq.com/openai/v1/models -H "Authorization: Bearer $GROQ_API_KEY"
 # and update the `id` fields below. `label` and `family` are display-only.
 #
 # `tier: production` models are stable; `preview` models are eval-only and
-# may be discontinued by Groq with little notice — fine for a dashboard that
-# re-runs nightly, but expect the occasional 404 (the runner logs & skips it).
+# may be discontinued by Groq with little notice (the runner logs & skips a 404).
+# Per-model request overrides go under `params:`, e.g. `reasoning_format: parsed`
+# for a Qwen reasoning model so its <think> block stays out of `content`.
 
 provider: groq
 endpoint: https://api.groq.com/openai/v1/chat/completions
 
-# Generation defaults (kept small to stay well under the 30k tokens/min free limit).
+# Generation defaults (kept small to stay well under the free-tier token limits).
 defaults:
   temperature: 0.0        # deterministic grading
   max_tokens: 1024        # headroom for reasoning models to finish thinking AND answer
   request_timeout_sec: 60
 
 models:
-  - id: llama-3.3-70b-versatile
-    label: Llama 3.3 70B
-    family: Meta Llama
-    tier: production
-    weights: open        # Llama 3.3 Community License
-
-  - id: llama-3.1-8b-instant
-    label: Llama 3.1 8B
-    family: Meta Llama
-    tier: production
-    weights: open
-
   - id: openai/gpt-oss-20b
     label: GPT-OSS 20B
     family: OpenAI OSS
@@ -41,16 +48,3 @@ models:
     family: OpenAI OSS
     tier: production
     weights: open        # Apache-2.0 open weights
-
-  - id: qwen/qwen3.6-27b
-    label: Qwen3.6 27B
-    family: Alibaba Qwen
-    tier: preview
-    weights: open        # Apache-2.0  (was qwen/qwen3-32b — retired by Groq, refreshed 2026-07)
-    params:
-      # Qwen is a reasoning model: by default it inlines its chain-of-thought in
-      # <think>…</think> inside `content`, which pollutes the string-match
-      # graders. "parsed" moves reasoning to a separate field so `content` is
-      # the clean final answer. (The engine also strips stray <think> as a
-      # belt-and-suspenders — see grading.strip_reasoning.)
-      reasoning_format: parsed

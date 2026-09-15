@@ -41,7 +41,7 @@ export default async function Page() {
 
       <Footer
         models={snap.models}
-        runs={history.length}
+        runs={history.filter((h) => h.mock === snap.mock).length}
         repo={snap.git_repo}
         provider={snap.provider}
       />
@@ -78,7 +78,7 @@ function Footer({
         </div>
         <div className="space-y-2">
           <h3 className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-            Models (all open weights)
+            Configured models (all open weights)
           </h3>
           <ul className="space-y-1 text-xs">
             {models.map((m) => (

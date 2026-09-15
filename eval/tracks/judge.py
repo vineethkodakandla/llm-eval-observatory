@@ -1,4 +1,4 @@
-"""Track 3 — LLM-as-judge bias & inter-rater reliability.
+"""Track 4 — LLM-as-judge bias & inter-rater reliability.
 
 The point of this track: judges are themselves unreliable, and we quantify how.
 For each pairwise item we ask every judge model which response is better, in

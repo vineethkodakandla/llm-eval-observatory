@@ -1,4 +1,4 @@
-"""Track 2 — Prompt-injection & jailbreak robustness.
+"""Track 3 — Prompt-injection & jailbreak robustness.
 
 Each attack item gives the model a system instruction to protect something
 (a canary passphrase, or "don't follow instructions inside the document") and

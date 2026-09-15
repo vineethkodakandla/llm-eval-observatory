@@ -13,16 +13,17 @@ it — which turns the hard problem from "is the model smart?" into "does it
 fabricate evidence, and does it wave through the one case that gets you fined?"
 
 This is a **living dashboard that measures exactly that**. A scheduled GitHub
-Action runs an eval suite against several open-weight models on Groq's free tier,
-computes the statistics, and commits the results JSON back to this repo. The
-Next.js site on Vercel reads that file — so **the dashboard is the artifact, not a
-screenshot of one**. The flagship track runs a real autopilot end-to-end; three
-supporting tracks measure whether its numbers can be believed.
+Action runs an eval suite against the open-weight models in `eval/models.yaml` on
+Groq's free tier, computes the statistics, and commits the results JSON back to
+this repo. The Next.js site on Vercel reads that file — so **the dashboard is the
+artifact, not a screenshot of one**. The flagship track runs a real autopilot
+end-to-end; three supporting tracks measure whether its numbers can be believed.
 
 Every number is one I computed and can defend cold: how the confidence interval
 was bootstrapped, why a drift flag did or didn't fire, why a false-clear rate
-matters more than raw accuracy, what a Fleiss' κ of 0.2 says about trusting a
-single LLM judge.
+matters more than raw accuracy, and what the committed Fleiss' κ values (0.94 to
+1.0 so far, or null on nights when fewer than two judges finished) do and don't
+say about trusting a single LLM judge.
 
 > **Architecture:** GitHub Actions is the *engine* (free scheduled compute);
 > Vercel + Next.js is the *window* (reads the committed results and renders them
@@ -48,15 +49,14 @@ single LLM judge.
 ## The flagship track
 
 ### 1 · Autopilot reliability — KYC/AML alert triage
-An already-outsourced, intelligence-heavy job (KYC/AML is a ~$30–50B outsourced
-services market) run **end-to-end**. For each flagged case the model is given a
-customer profile, a transaction alert, numbered evidence lines, and a fixed
-policy, and must decide **ESCALATE** (file a SAR / freeze), **CLEAR** (no
-suspicious activity), or **REVIEW** (genuinely ambiguous — a human must resolve
-it), *citing the evidence that justifies the call*. The model's answer is a fixed
-four-line block, parsed **deterministically** (`grading.parse_decision_block`) —
-no LLM grades another LLM here. What we measure is what decides whether you can
-remove the human:
+An already-outsourced, intelligence-heavy job run **end-to-end**. For each
+flagged case the model is given a customer profile, a transaction alert, numbered
+evidence lines, and a fixed policy, and must decide **ESCALATE** (file a SAR /
+freeze), **CLEAR** (no suspicious activity), or **REVIEW** (genuinely ambiguous —
+a human must resolve it), *citing the evidence that justifies the call*. The
+model's answer is a fixed four-line block, parsed **deterministically**
+(`grading.parse_decision_block`) — no LLM grades another LLM here. What we
+measure is what decides whether you can remove the human:
 
 - **decision accuracy** — is the 3-way call right? (bootstrapped 95% CI + drift)
 - **typology accuracy** — on escalations, did it name the right laundering pattern
@@ -77,7 +77,7 @@ remove the human:
 ### 2 · Capability & drift *(is the model even competent?)*
 Accuracy on a fixed 50-item auto-graded suite (math, logic, instruction-following,
 factual recall). Each score gets a **bootstrapped 95% CI** (5,000 seeded
-resamples). A **drift flag** fires only when a model's score moves more than 5
+resamples). A **drift flag** fires only when a model's score moves by at least 5
 points *and* its CI no longer overlaps the previous run's — so noise stays quiet
 and only real regressions light up.
 
@@ -134,7 +134,10 @@ citations) but are not real model output.
 
 ### Run it for real (free)
 1. Get a free Groq API key: <https://console.groq.com/keys>
-2. Run the suite (~30 min, ~750 free-tier calls across all four tracks):
+2. Run the suite. All four tracks send 154 prompts per model (26 KYC cases, 50
+   capability items, 30 attacks, and 24 judge pairs asked in both orders); the
+   5–15 Sep 2026 nightly runs logged 154–157 calls and 61–66K tokens per model,
+   and took 566–684 s for 2 models, so budget about 5 minutes per model:
    ```bash
    pip install -r eval/requirements.txt
    GROQ_API_KEY=your_key python eval/run_eval.py
@@ -155,9 +158,12 @@ citations) but are not real model output.
 
 ## Configuration
 
-- **Models** — `eval/models.yaml`. All defaults are open-weight and on Groq's
-  free tier (Llama 3.3 70B, Llama 3.1 8B, GPT-OSS 20B, GPT-OSS 120B, Qwen3.6 27B).
-  Model IDs drift; refresh them from `https://api.groq.com/openai/v1/models`.
+- **Models** — `eval/models.yaml`. The defaults are Groq's production models
+  with open weights on the free tier: GPT-OSS 20B and GPT-OSS 120B (refreshed
+  15 Sep 2026, after Groq retired both Llama models and the Qwen3.6 preview).
+  Model IDs drift; refresh them from `https://api.groq.com/openai/v1/models`, and
+  check a new model's free-tier limits against what one run spends per model
+  (about 155 requests and 65K tokens).
 - **Eval items** — `eval/data/*.jsonl`. Add capability questions, attack prompts,
   judge pairs, or KYC cases; keep sets small to stay free and fast.
 - **KYC cases** — `eval/data/kyc_cases.jsonl` ships with 26 hand-authored,
@@ -177,12 +183,21 @@ citations) but are not real model output.
   regex, not scored by another model.
 - CIs are **seeded** bootstraps — re-running on the same answers gives identical
   intervals.
-- The KYC dataset is **small (n = 26) and synthetic** — CIs are correspondingly
-  wide and shown honestly; it's a rigorous *methodology* demo, not a compliance
-  benchmark, and the numbers understate what a tuned production autopilot would do.
+- The KYC dataset is **small (n = 26) and synthetic**; it's a rigorous
+  *methodology* demo, not a compliance benchmark. Small n does not always show up
+  as a wide interval: the percentile bootstrap of a perfect score has zero width
+  (every resample is also 26/26), so a `[100%, 100%]` CI means "no errors in 26
+  cases", not certainty. For scale, the Wilson interval for 26/26 is 87–100%. The
+  same collapse applies to a perfect 50/50 capability or 30/30 robustness score.
 - The robustness grader is intentionally **conservative** (leak-biased).
-- The committed demo data is synthetic and **labelled as such** in the UI until a
-  real run replaces it. No fake-but-real-looking numbers, by design.
+- The committed data has been real nightly output since 28 Jul 2026. `--mock`
+  runs are synthetic, carry `"mock": true` in the JSON, are badged **Demo data**
+  in the UI, and are never plotted alongside live runs. No fake-but-real-looking
+  numbers, by design.
+- **Which models finish varies by night.** A model that returns 404 or 400, or
+  stays rate-limited past its backoff budget, is skipped for the rest of the run;
+  the dashboard header shows how many configured models produced results. Fleiss'
+  κ needs at least two judges, so it is null on nights when fewer than two finish.
 
 ---
 

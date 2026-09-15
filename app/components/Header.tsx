@@ -3,6 +3,8 @@ import { relativeTime, repoLinks, shortSha } from "../lib/format";
 
 export default function Header({ snap }: { snap: Snapshot }) {
   const links = repoLinks(snap.git_repo, snap.git_sha);
+  const evaluated = evaluatedModelIds(snap);
+  const skipped = snap.models.filter((m) => !evaluated.has(m.id)).map((m) => m.label);
   const live = snap.status === "ok";
   const dot = !live
     ? "bg-slate-500"
@@ -78,8 +80,18 @@ export default function Header({ snap }: { snap: Snapshot }) {
             <span className="stat-num text-slate-400">{shortSha(snap.git_sha)}</span>
           )}
         </Field>
-        <Field label="Models">
-          <span className="stat-num">{snap.models.length}</span>
+        <Field label="Models evaluated">
+          <span
+            className="stat-num"
+            title={
+              skipped.length
+                ? `Configured but produced no results this run: ${skipped.join(", ")}`
+                : "Every configured model produced results this run"
+            }
+          >
+            {evaluated.size}
+            <span className="text-slate-500"> of {snap.models.length} configured</span>
+          </span>
         </Field>
         <Field label="API calls">
           <span className="stat-num">{snap.totals.api_calls.toLocaleString()}</span>
@@ -108,5 +120,18 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
       </span>
       <span className="text-slate-200">{children}</span>
     </div>
+  );
+}
+
+/** Models that produced results in at least one track of this snapshot. */
+function evaluatedModelIds(snap: Snapshot): Set<string> {
+  const t = snap.tracks;
+  return new Set(
+    [
+      ...(t.autopilot?.per_model ?? []),
+      ...(t.capability?.per_model ?? []),
+      ...(t.robustness?.per_model ?? []),
+      ...(t.judge?.per_judge ?? []),
+    ].map((m) => m.model)
   );
 }

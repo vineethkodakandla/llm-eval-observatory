@@ -71,7 +71,7 @@ def drift(current: Interval, previous: Interval | None,
           abs_threshold: float = DRIFT_ABS_THRESHOLD) -> dict:
     """Flag a meaningful move between two runs.
 
-    We require BOTH (a) the point estimate to move more than `abs_threshold`
+    We require BOTH (a) the point estimate to move by at least `abs_threshold`
     AND (b) the two 95% CIs to be disjoint. Requiring non-overlap keeps us from
     crying wolf on noise — a 4-point wobble inside overlapping intervals is not
     a regression, it's sampling variance.

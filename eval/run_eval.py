@@ -1,6 +1,6 @@
 """Nightly eval orchestrator.
 
-Runs all three tracks against the configured open-source models on Groq, writes
+Runs all four tracks against the configured open-weight models on Groq, writes
 the dashboard's data files, and appends a compact summary to the run history.
 
 Usage:

@@ -24,8 +24,8 @@ HISTORY_PATH = DATA_OUT / "history.jsonl"
 BOOTSTRAP_SEED = 1729
 BOOTSTRAP_ITERS = 5000
 
-# A model's score is flagged as "drift" when it moves more than this from the
-# previous run AND the two runs' 95% CIs do not overlap (see stats.drift).
+# A model's score is flagged as "drift" when it moves by at least this much from
+# the previous run AND the two runs' 95% CIs do not overlap (see stats.drift).
 DRIFT_ABS_THRESHOLD = 0.05
 
 # The judge is asked for a single character ('1' or '2'), but reasoning models

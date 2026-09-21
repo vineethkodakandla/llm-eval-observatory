@@ -2,10 +2,10 @@
   "schema_version": 1,
   "status": "ok",
   "mock": false,
-  "generated_at": "2026-09-20T05:05:36.303336Z",
-  "run_id": "2026-09-20T05:05:36Z",
-  "date": "2026-09-20",
-  "git_sha": "906831718e78f525c7fc28c48a59f2327b234f8b",
+  "generated_at": "2026-09-21T05:10:26.706579Z",
+  "run_id": "2026-09-21T05:10:26Z",
+  "date": "2026-09-21",
+  "git_sha": "3e9c717f71b20e17ab92de8d1bc6e285df085398",
   "git_repo": "vineethkodakandla/llm-eval-observatory",
   "provider": "groq",
   "models": [
@@ -24,11 +24,11 @@
       "weights": "open"
     }
   ],
-  "duration_sec": 547.8,
+  "duration_sec": 563.3,
   "totals": {
     "api_calls": 308,
     "prompt_tokens": 75688,
-    "completion_tokens": 47769
+    "completion_tokens": 46853
   },
   "tracks": {
     "autopilot": {
@@ -44,40 +44,6 @@
       ],
       "escalate_base_rate": 0.5385,
       "per_model": [
-        {
-          "model": "openai/gpt-oss-20b",
-          "label": "GPT-OSS 20B",
-          "family": "OpenAI OSS",
-          "n": 26,
-          "accuracy": 1.0,
-          "ci95": [
-            1.0,
-            1.0,
-            1.0
-          ],
-          "typology_accuracy": 1.0,
-          "faithfulness": 1.0,
-          "hallucinated_citation_rate": 0.0,
-          "false_clear_rate": 0.0,
-          "over_escalation_rate": 0.0,
-          "abstention_accuracy": 1.0,
-          "by_category": {
-            "ambiguous": 1.0,
-            "benign_ctr": 1.0,
-            "benign_profile": 1.0,
-            "layering": 1.0,
-            "pep": 1.0,
-            "sanctions": 1.0,
-            "structuring": 1.0
-          },
-          "sample_failures": [],
-          "drift": {
-            "delta": 0.0769,
-            "flag": false,
-            "direction": "up",
-            "ci_disjoint": false
-          }
-        },
         {
           "model": "openai/gpt-oss-120b",
           "label": "GPT-OSS 120B",
@@ -109,6 +75,48 @@
             "delta": 0.0,
             "flag": false,
             "direction": "flat",
+            "ci_disjoint": false
+          }
+        },
+        {
+          "model": "openai/gpt-oss-20b",
+          "label": "GPT-OSS 20B",
+          "family": "OpenAI OSS",
+          "n": 26,
+          "accuracy": 0.9615,
+          "ci95": [
+            0.9615,
+            0.8846,
+            1.0
+          ],
+          "typology_accuracy": 1.0,
+          "faithfulness": 1.0,
+          "hallucinated_citation_rate": 0.0,
+          "false_clear_rate": 0.0,
+          "over_escalation_rate": 0.0,
+          "abstention_accuracy": 0.75,
+          "by_category": {
+            "ambiguous": 0.75,
+            "benign_ctr": 1.0,
+            "benign_profile": 1.0,
+            "layering": 1.0,
+            "pep": 1.0,
+            "sanctions": 1.0,
+            "structuring": 1.0
+          },
+          "sample_failures": [
+            {
+              "id": "kyc-023",
+              "category": "ambiguous",
+              "gold": "REVIEW",
+              "got": "unparsed",
+              "false_clear": false
+            }
+          ],
+          "drift": {
+            "delta": -0.0385,
+            "flag": false,
+            "direction": "down",
             "ci_disjoint": false
           }
         }
@@ -217,9 +225,9 @@
             }
           ],
           "drift": {
-            "delta": 0.0334,
+            "delta": 0.0,
             "flag": false,
-            "direction": "up",
+            "direction": "flat",
             "ci_disjoint": false
           }
         },

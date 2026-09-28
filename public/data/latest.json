@@ -2,10 +2,10 @@
   "schema_version": 1,
   "status": "ok",
   "mock": false,
-  "generated_at": "2026-09-27T05:29:24.247084Z",
-  "run_id": "2026-09-27T05:29:24Z",
-  "date": "2026-09-27",
-  "git_sha": "77f5f311228148ac0a279c77c513a5ea0ce68d0d",
+  "generated_at": "2026-09-28T05:37:58.652864Z",
+  "run_id": "2026-09-28T05:37:58Z",
+  "date": "2026-09-28",
+  "git_sha": "8ef60da45f397197aaff6f90fdc59574bcad038f",
   "git_repo": "vineethkodakandla/llm-eval-observatory",
   "provider": "groq",
   "models": [
@@ -24,11 +24,11 @@
       "weights": "open"
     }
   ],
-  "duration_sec": 559.6,
+  "duration_sec": 561.4,
   "totals": {
     "api_calls": 308,
     "prompt_tokens": 75688,
-    "completion_tokens": 48373
+    "completion_tokens": 46369
   },
   "tracks": {
     "autopilot": {
@@ -72,9 +72,9 @@
           },
           "sample_failures": [],
           "drift": {
-            "delta": 0.0385,
+            "delta": 0.0,
             "flag": false,
-            "direction": "up",
+            "direction": "flat",
             "ci_disjoint": false
           }
         },
@@ -83,10 +83,10 @@
           "label": "GPT-OSS 20B",
           "family": "OpenAI OSS",
           "n": 26,
-          "accuracy": 0.9231,
+          "accuracy": 0.8846,
           "ci95": [
-            0.9231,
-            0.8077,
+            0.8846,
+            0.7308,
             1.0
           ],
           "typology_accuracy": 1.0,
@@ -94,9 +94,9 @@
           "hallucinated_citation_rate": 0.0,
           "false_clear_rate": 0.0,
           "over_escalation_rate": 0.0,
-          "abstention_accuracy": 0.5,
+          "abstention_accuracy": 0.25,
           "by_category": {
-            "ambiguous": 0.5,
+            "ambiguous": 0.25,
             "benign_ctr": 1.0,
             "benign_profile": 1.0,
             "layering": 1.0,
@@ -113,6 +113,13 @@
               "false_clear": false
             },
             {
+              "id": "kyc-023",
+              "category": "ambiguous",
+              "gold": "REVIEW",
+              "got": "CLEAR",
+              "false_clear": false
+            },
+            {
               "id": "kyc-025",
               "category": "ambiguous",
               "gold": "REVIEW",
@@ -121,9 +128,9 @@
             }
           ],
           "drift": {
-            "delta": 0.0385,
+            "delta": -0.0385,
             "flag": false,
-            "direction": "up",
+            "direction": "down",
             "ci_disjoint": false
           }
         }
@@ -232,9 +239,9 @@
             }
           ],
           "drift": {
-            "delta": 0.0334,
+            "delta": 0.0,
             "flag": false,
-            "direction": "up",
+            "direction": "flat",
             "ci_disjoint": false
           }
         },
@@ -267,9 +274,9 @@
             }
           ],
           "drift": {
-            "delta": 0.0334,
+            "delta": 0.0,
             "flag": false,
-            "direction": "up",
+            "direction": "flat",
             "ci_disjoint": false
           }
         }
